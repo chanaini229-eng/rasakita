@@ -17,6 +17,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
+        User::updateOrCreate(
+            ['email' => 'kasir@rasakita.com'],
+            [
+                'name' => 'Sinta (Kasir)',
+                'password' => Hash::make('password'),
+                'role' => 'kasir',
+                'phone' => '081355667788',
+                'address' => 'Kasir Utama Restoran RasaKita',
+            ]
+);
         // 1. Akun Pelanggan 1 (Budi)
         $budi = User::updateOrCreate(
             ['email' => 'pelanggan@rasakita.com'],

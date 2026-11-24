@@ -95,39 +95,40 @@
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50 antialiased">
 
-    <!-- Top Pelanggan Account Switcher Bar -->
-    <div class="no-print bg-slate-900 text-slate-300 text-xs py-1.5 px-4">
-        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span>Akun Aktif:</span>
-                @auth
-                    <span class="font-bold text-white px-2 py-0.5 rounded bg-orange-600">
-                        PELANGGAN ({{ auth()->user()->name }})
-                    </span>
-                    <span class="text-orange-300 italic hidden sm:inline">• Menu Read-Only & Riwayat Transaksi Diri Sendiri</span>
-                @else
-                    <span class="font-bold text-amber-300 px-2 py-0.5 rounded bg-slate-800">Tamu / Belum Login</span>
-                @endauth
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="text-slate-400">Ganti Akun Pelanggan:</span>
-                <a href="{{ route('quick.login', 'pelanggan') }}" class="px-2.5 py-0.5 rounded bg-orange-600 hover:bg-orange-500 text-white font-medium transition">
-                    <i class="fa-solid fa-user-check mr-1"></i> Pelanggan 1 (Budi)
-                </a>
-                <a href="{{ route('quick.login', 'siti') }}" class="px-2.5 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
-                    <i class="fa-solid fa-user mr-1"></i> Pelanggan 2 (Siti)
-                </a>
+    @if(!auth()->check() || auth()->user()->role !== 'kasir')
+        <div class="no-print bg-slate-900 text-slate-300 text-xs py-1.5 px-4">
+            <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span>Akun Aktif:</span>
+                    @auth
+                        <span class="font-bold text-white px-2 py-0.5 rounded bg-orange-600">
+                            PELANGGAN ({{ auth()->user()->name }})
+                        </span>
+                        <span class="text-orange-300 italic hidden sm:inline">• Menu Read-Only & Riwayat Transaksi Diri Sendiri</span>
+                    @else
+                        <span class="font-bold text-amber-300 px-2 py-0.5 rounded bg-slate-800">Tamu / Belum Login</span>
+                    @endauth
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-slate-400">Ganti Akun Pelanggan:</span>
+                    <a href="{{ route('quick.login', 'pelanggan') }}" class="px-2.5 py-0.5 rounded bg-orange-600 hover:bg-orange-500 text-white font-medium transition">
+                        <i class="fa-solid fa-user-check mr-1"></i> Pelanggan 1 (Budi)
+                    </a>
+                    <a href="{{ route('quick.login', 'siti') }}" class="px-2.5 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
+                        <i class="fa-solid fa-user mr-1"></i> Pelanggan 2 (Siti)
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 
     <!-- Main Navigation Bar -->
     <header class="no-print sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 <!-- Brand Logo -->
-                <a href="{{ route('home') }}" class="flex items-center gap-3 group">
+                <a href="{{ auth()->check() && auth()->user()->role === 'kasir' ? route('kasir.dashboard') : route('home') }}" class="flex items-center gap-3 group">
                     <div class="w-11 h-11 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-600 border border-orange-200/50 group-hover:scale-105 transition-transform">
                         <i class="fa-solid fa-kitchen-set text-2xl text-[#e8503a]"></i>
                     </div>
@@ -139,45 +140,68 @@
                     </div>
                 </a>
 
-                <!-- Desktop Nav Links -->
-                <nav class="hidden md:flex items-center space-x-8">
-                    <a href="{{ route('home') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('home') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
-                        Beranda
-                    </a>
-                    <a href="{{ route('menu.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('menu.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
-                        Menu
-                    </a>
-                    <a href="{{ route('about') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('about') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
-                        Tentang Kami
-                    </a>
-                    <a href="{{ route('contact') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('contact') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
-                        Kontak
-                    </a>
-                    @auth
-                        <a href="{{ route('order.history') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('order.history') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
-                            Riwayat Transaksi
+                <!-- Desktop Nav Links (Dinamis sesuai Role) -->
+                <nav class="hidden md:flex items-center space-x-7">
+                    @if(auth()->check() && auth()->user()->role === 'kasir')
+                        <a href="{{ route('kasir.dashboard') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('kasir.dashboard') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Dashboard Kasir
                         </a>
-                    @endauth
+                        <a href="{{ route('kasir.menu.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('kasir.menu.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Daftar Menu
+                        </a>
+                        <a href="{{ route('kasir.pesanan.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('kasir.pesanan.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Konfirmasi Pesanan
+                        </a>
+                        <a href="{{ route('kasir.laporan.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('kasir.laporan.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Laporan & Struk
+                        </a>
+                        <a href="{{ route('about') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('about') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Tentang Kami
+                        </a>
+                        <a href="{{ route('contact') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('contact') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Kontak
+                        </a>
+                    @else
+                        <a href="{{ route('home') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('home') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Beranda
+                        </a>
+                        <a href="{{ route('menu.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('menu.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Menu
+                        </a>
+                        <a href="{{ route('about') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('about') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Tentang Kami
+                        </a>
+                        <a href="{{ route('contact') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('contact') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Kontak
+                        </a>
+                        @auth
+                            <a href="{{ route('order.history') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('order.history') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                                Riwayat Transaksi
+                            </a>
+                        @endauth
+                    @endif
                 </nav>
 
                 <!-- Right Side Actions: Search, Cart, User -->
                 <div class="flex items-center gap-4">
-                    <!-- Search Icon Trigger -->
-                    <a href="{{ route('menu.index') }}" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-[#e8503a] hover:bg-orange-50 transition" title="Cari Menu">
-                        <i class="fa-solid fa-magnifying-glass text-lg"></i>
-                    </a>
+                    @if(!auth()->check() || auth()->user()->role !== 'kasir')
+                        <!-- Search Icon Trigger -->
+                        <a href="{{ route('menu.index') }}" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-[#e8503a] hover:bg-orange-50 transition" title="Cari Menu">
+                            <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                        </a>
 
-                    <!-- Cart Icon with Live Badge -->
-                    @php
-                        $cart = session()->get('cart', []);
-                        $cartCount = array_sum(array_column($cart, 'quantity'));
-                    @endphp
-                    <a href="{{ route('cart.index') }}" class="relative w-10 h-10 rounded-full flex items-center justify-center text-slate-700 hover:text-[#e8503a] hover:bg-orange-50 transition" title="Keranjang Pesanan">
-                        <i class="fa-solid fa-cart-shopping text-lg"></i>
-                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-[#e8503a] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm {{ $cartCount > 0 ? '' : 'hidden' }}">
-                            {{ $cartCount }}
-                        </span>
-                    </a>
+                        <!-- Cart Icon with Live Badge -->
+                        @php
+                            $cart = session()->get('cart', []);
+                            $cartCount = array_sum(array_column($cart, 'quantity'));
+                        @endphp
+                        <a href="{{ route('cart.index') }}" class="relative w-10 h-10 rounded-full flex items-center justify-center text-slate-700 hover:text-[#e8503a] hover:bg-orange-50 transition" title="Keranjang Pesanan">
+                            <i class="fa-solid fa-cart-shopping text-lg"></i>
+                            <span id="cart-badge" class="absolute -top-1 -right-1 bg-[#e8503a] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm {{ $cartCount > 0 ? '' : 'hidden' }}">
+                                {{ $cartCount }}
+                            </span>
+                        </a>
+                    @endif
 
                     <!-- User Profile / Auth Button -->
                     @auth
@@ -193,18 +217,35 @@
                             <!-- Dropdown Menu -->
                             <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 hidden group-hover:block transition-all z-50">
                                 <div class="px-4 py-2 border-b border-slate-100">
-                                    <p class="text-xs text-slate-400">Pelanggan Aktif:</p>
+                                    <p class="text-xs text-slate-400">Akun Aktif:</p>
                                     <p class="text-sm font-bold text-slate-800 truncate">{{ auth()->user()->name }}</p>
-                                    <span class="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-orange-100 text-orange-700">
-                                        Role: Pelanggan
+                                    <span class="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold rounded-full {{ auth()->user()->role === 'kasir' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700' }} uppercase">
+                                        Role: {{ auth()->user()->role }}
                                     </span>
+                                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-user-pen text-slate-400"></i> Edit Profil Saya
+                                    </a>
                                 </div>
-                                <a href="{{ route('order.history') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
-                                    <i class="fa-solid fa-receipt text-slate-400"></i> Riwayat Transaksi Saya
-                                </a>
-                                <a href="{{ route('cart.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
-                                    <i class="fa-solid fa-cart-shopping text-slate-400"></i> Keranjang Pesanan
-                                </a>
+
+                                @if(auth()->user()->role === 'kasir')
+                                    <a href="{{ route('kasir.dashboard') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-gauge-high text-slate-400"></i> Dashboard Kasir
+                                    </a>
+                                    <a href="{{ route('kasir.pesanan.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-clipboard-check text-slate-400"></i> Konfirmasi Pesanan
+                                    </a>
+                                    <a href="{{ route('kasir.laporan.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-receipt text-slate-400"></i> Laporan & Struk
+                                    </a>
+                                @else
+                                    <a href="{{ route('order.history') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-receipt text-slate-400"></i> Riwayat Transaksi Saya
+                                    </a>
+                                    <a href="{{ route('cart.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-cart-shopping text-slate-400"></i> Keranjang Pesanan
+                                    </a>
+                                @endif
+
                                 <div class="border-t border-slate-100 my-1"></div>
                                 <form action="{{ route('logout') }}" method="POST" class="w-full">
                                     @csrf
@@ -296,36 +337,64 @@
                 <div>
                     <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Navigasi</h4>
                     <ul class="space-y-2.5 text-xs text-slate-400">
-                        <li><a href="{{ route('home') }}" class="hover:text-white transition">Beranda</a></li>
-                        <li><a href="{{ route('menu.index') }}" class="hover:text-white transition">Daftar Menu</a></li>
-                        <li><a href="{{ route('about') }}" class="hover:text-white transition">Tentang Kami</a></li>
-                        <li><a href="{{ route('contact') }}" class="hover:text-white transition">Hubungi Kami</a></li>
-                        @auth
-                            <li><a href="{{ route('order.history') }}" class="hover:text-white transition">Riwayat Transaksi Saya</a></li>
-                        @endauth
+                        @if(auth()->check() && auth()->user()->role === 'kasir')
+                            <li><a href="{{ route('kasir.dashboard') }}" class="hover:text-white transition">Dashboard Kasir</a></li>
+                            <li><a href="{{ route('kasir.menu.index') }}" class="hover:text-white transition">Kelola Daftar Menu</a></li>
+                            <li><a href="{{ route('kasir.pesanan.index') }}" class="hover:text-white transition">Konfirmasi Pesanan</a></li>
+                            <li><a href="{{ route('kasir.laporan.index') }}" class="hover:text-white transition">Laporan & Struk</a></li>
+                        @else
+                            <li><a href="{{ route('home') }}" class="hover:text-white transition">Beranda</a></li>
+                            <li><a href="{{ route('menu.index') }}" class="hover:text-white transition">Daftar Menu</a></li>
+                            <li><a href="{{ route('about') }}" class="hover:text-white transition">Tentang Kami</a></li>
+                            <li><a href="{{ route('contact') }}" class="hover:text-white transition">Hubungi Kami</a></li>
+                            @auth
+                                <li><a href="{{ route('order.history') }}" class="hover:text-white transition">Riwayat Transaksi Saya</a></li>
+                            @endauth
+                        @endif
                     </ul>
                 </div>
 
-                <!-- Col 3: Ketentuan Pelanggan -->
+                <!-- Col 3: Ketentuan Role -->
                 <div>
-                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Aturan Pelanggan</h4>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">
+                        {{ auth()->check() && auth()->user()->role === 'kasir' ? 'Aturan Kasir' : 'Aturan Pelanggan' }}
+                    </h4>
                     <ul class="space-y-2 text-xs text-slate-400 leading-relaxed">
-                        <li class="flex items-start gap-2">
-                            <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
-                            <span>Bisa memesan aneka makanan & minuman</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
-                            <span>Melihat struk & riwayat transaksi diri sendiri</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fa-solid fa-shield-halved text-amber-400 mt-0.5"></i>
-                            <span>Privasi terjaga: Tidak bisa melihat transaksi orang lain</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fa-solid fa-lock text-slate-400 mt-0.5"></i>
-                            <span>Tidak bisa menambah, mengedit, atau menghapus menu</span>
-                        </li>
+                        @if(auth()->check() && auth()->user()->role === 'kasir')
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                <span>Mengelola daftar menu (Tambah, Edit, Hapus)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                <span>Konfirmasi pesanan mandiri dari pelanggan</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                <span>Melihat laporan transaksi & cetak struk pembayaran</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-lock text-amber-400 mt-0.5"></i>
+                                <span>Tidak dapat mengubah atau menghapus identitas pengguna</span>
+                            </li>
+                        @else
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                <span>Bisa memesan aneka makanan & minuman</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                <span>Melihat struk & riwayat transaksi diri sendiri</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-shield-halved text-amber-400 mt-0.5"></i>
+                                <span>Privasi terjaga: Tidak bisa melihat transaksi orang lain</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-lock text-slate-400 mt-0.5"></i>
+                                <span>Tidak bisa menambah, mengedit, atau menghapus menu</span>
+                            </li>
+                        @endif
                     </ul>
                 </div>
 

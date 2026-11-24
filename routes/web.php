@@ -3,6 +3,9 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Kasir\KasirDashboardController;
+use App\Http\Controllers\Kasir\KasirMenuController;
+use App\Http\Controllers\Kasir\KasirOrderController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
@@ -41,8 +44,12 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/quick-login/{role}', [AuthController::class, 'quickLogin'])->name('quick.login');
 
-// Fitur Pemesanan & Transaksi Pelanggan
+// Fitur Pemesanan & Transaksi Pelanggan + Profil Diri Sendiri
 Route::middleware('auth')->group(function () {
+    // Edit Profil Diri Sendiri (Berlaku untuk Pelanggan & Kasir)
+    Route::get('/profil', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profil', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
     // Checkout & Pemesanan Makanan (Aturan 4)
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
     Route::post('/checkout', [OrderController::class, 'store'])->name('order.store');
@@ -59,4 +66,28 @@ Route::middleware('auth')->group(function () {
         Route::put('/{menu}', [MenuController::class, 'update'])->name('update');
         Route::delete('/{menu}', [MenuController::class, 'destroy'])->name('destroy');
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| RasaKita Routes - Khusus Role Kasir
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:kasir,admin'])->prefix('kasir')->name('kasir.')->group(function () {
+    // Dashboard Kasir
+    Route::get('/dashboard', [KasirDashboardController::class, 'index'])->name('dashboard');
+
+    // Daftar Menu (Kelola Menu: Tambah, Edit, Hapus)
+    Route::resource('menu', KasirMenuController::class)->except(['show']);
+
+    // Konfirmasi Pesanan Mandiri dari Pelanggan
+    Route::get('/pesanan', [KasirOrderController::class, 'konfirmasiIndex'])->name('pesanan.index');
+    Route::patch('/pesanan/{order}/status', [KasirOrderController::class, 'updateStatus'])->name('pesanan.status');
+
+    // Laporan Transaksi & Struk Semua Pengguna
+    Route::get('/laporan', [KasirOrderController::class, 'laporan'])->name('laporan.index');
+    Route::get('/struk/{order}', [KasirOrderController::class, 'struk'])->name('struk');
+
+    // Aturan Kasir 1: Pembatasan ubah identitas pengguna (403 Forbidden)
+    Route::match(['get', 'put', 'patch', 'delete'], '/pengguna/{id?}', [KasirOrderController::class, 'blokirKelolaPengguna'])->name('pengguna.blocked');
 });
