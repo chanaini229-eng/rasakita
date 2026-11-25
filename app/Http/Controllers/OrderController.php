@@ -35,7 +35,7 @@ class OrderController extends Controller
     }
 
     /**
-     * ATURAN PELANGGAN 4: Bisa memesan makanan
+     * ATURAN PELANGGAN 4: Bisa memesan makanan (Admin juga bisa memesan makanan)
      */
     public function store(Request $request)
     {
@@ -103,11 +103,11 @@ class OrderController extends Controller
 
     /**
      * ATURAN PELANGGAN 5: Menampilkan struk pemesanan diri sendiri
-     * ATURAN PELANGGAN 3: Tidak bisa melihat laporan transaksi orang lain
+     * ATURAN PELANGGAN 3: Tidak bisa melihat laporan transaksi orang lain (Admin & Kasir diizinkan)
      */
     public function receipt(Order $order)
     {
-        if (Auth::id() !== $order->user_id) {
+        if (!in_array(Auth::user()->role, ['admin', 'kasir']) && Auth::id() !== $order->user_id) {
             abort(403, 'Akses Ditolak: Anda tidak dapat melihat laporan transaksi / struk milik pelanggan lain.');
         }
 

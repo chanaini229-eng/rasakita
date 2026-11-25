@@ -102,16 +102,23 @@
                     <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
                     <span>Akun Aktif:</span>
                     @auth
-                        <span class="font-bold text-white px-2 py-0.5 rounded bg-orange-600">
-                            PELANGGAN ({{ auth()->user()->name }})
-                        </span>
-                        <span class="text-orange-300 italic hidden sm:inline">• Menu Read-Only & Riwayat Transaksi Diri Sendiri</span>
+                        @if(auth()->user()->role === 'admin')
+                            <span class="font-bold text-white px-2 py-0.5 rounded bg-emerald-600">
+                                ADMIN ({{ auth()->user()->name }})
+                            </span>
+                            <span class="text-emerald-300 italic hidden sm:inline">• Kelola Menu, Kasir, Laporan Pelanggan & Kelola Role Pengguna</span>
+                        @else
+                            <span class="font-bold text-white px-2 py-0.5 rounded bg-orange-600">
+                                PELANGGAN ({{ auth()->user()->name }})
+                            </span>
+                            <span class="text-orange-300 italic hidden sm:inline">• Menu Read-Only & Riwayat Transaksi Diri Sendiri</span>
+                        @endif
                     @else
                         <span class="font-bold text-amber-300 px-2 py-0.5 rounded bg-slate-800">Tamu / Belum Login</span>
                     @endauth
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-slate-400">Ganti Akun Pelanggan:</span>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-slate-400">Ganti Akun:</span>
                     <a href="{{ route('quick.login', 'pelanggan') }}" class="px-2.5 py-0.5 rounded bg-orange-600 hover:bg-orange-500 text-white font-medium transition">
                         <i class="fa-solid fa-user-check mr-1"></i> Pelanggan 1 (Budi)
                     </a>
@@ -161,6 +168,25 @@
                         <a href="{{ route('contact') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('contact') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
                             Kontak
                         </a>
+                    @elseif(auth()->check() && auth()->user()->role === 'admin')
+                        <a href="{{ route('home') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('home') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Beranda
+                        </a>
+                        <a href="{{ route('admin.menus.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('admin.menus.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Kelola Menu
+                        </a>
+                        <a href="{{ route('admin.pos.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('admin.pos.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Kasir
+                        </a>
+                        <a href="{{ route('admin.reports.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('admin.reports.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Laporan Pelanggan
+                        </a>
+                        <a href="{{ route('admin.users.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('admin.users.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Kelola Pengguna
+                        </a>
+                        <a href="{{ route('order.history') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('order.history') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Riwayat Transaksi
+                        </a>
                     @else
                         <a href="{{ route('home') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('home') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
                             Beranda
@@ -186,7 +212,7 @@
                 <div class="flex items-center gap-4">
                     @if(!auth()->check() || auth()->user()->role !== 'kasir')
                         <!-- Search Icon Trigger -->
-                        <a href="{{ route('menu.index') }}" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-[#e8503a] hover:bg-orange-50 transition" title="Cari Menu">
+                        <a href="{{ auth()->check() && auth()->user()->role === 'admin' ? route('admin.menus.index') : route('menu.index') }}" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-[#e8503a] hover:bg-orange-50 transition" title="Cari Menu">
                             <i class="fa-solid fa-magnifying-glass text-lg"></i>
                         </a>
 
@@ -219,7 +245,7 @@
                                 <div class="px-4 py-2 border-b border-slate-100">
                                     <p class="text-xs text-slate-400">Akun Aktif:</p>
                                     <p class="text-sm font-bold text-slate-800 truncate">{{ auth()->user()->name }}</p>
-                                    <span class="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold rounded-full {{ auth()->user()->role === 'kasir' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700' }} uppercase">
+                                    <span class="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold rounded-full {{ in_array(auth()->user()->role, ['kasir', 'admin']) ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700' }} uppercase">
                                         Role: {{ auth()->user()->role }}
                                     </span>
                                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
@@ -236,6 +262,22 @@
                                     </a>
                                     <a href="{{ route('kasir.laporan.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
                                         <i class="fa-solid fa-receipt text-slate-400"></i> Laporan & Struk
+                                    </a>
+                                @elseif(auth()->user()->role === 'admin')
+                                    <a href="{{ route('admin.menus.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-utensils text-slate-400"></i> Kelola Menu
+                                    </a>
+                                    <a href="{{ route('admin.pos.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-cash-register text-slate-400"></i> Mode Kasir
+                                    </a>
+                                    <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-chart-line text-slate-400"></i> Laporan Pelanggan
+                                    </a>
+                                    <a href="{{ route('admin.users.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-users-gear text-slate-400"></i> Kelola Pengguna & Role
+                                    </a>
+                                    <a href="{{ route('order.history') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-receipt text-slate-400"></i> Riwayat Transaksi Saya
                                     </a>
                                 @else
                                     <a href="{{ route('order.history') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
@@ -342,6 +384,12 @@
                             <li><a href="{{ route('kasir.menu.index') }}" class="hover:text-white transition">Kelola Daftar Menu</a></li>
                             <li><a href="{{ route('kasir.pesanan.index') }}" class="hover:text-white transition">Konfirmasi Pesanan</a></li>
                             <li><a href="{{ route('kasir.laporan.index') }}" class="hover:text-white transition">Laporan & Struk</a></li>
+                        @elseif(auth()->check() && auth()->user()->role === 'admin')
+                            <li><a href="{{ route('home') }}" class="hover:text-white transition">Beranda</a></li>
+                            <li><a href="{{ route('admin.menus.index') }}" class="hover:text-white transition">Kelola Daftar Menu</a></li>
+                            <li><a href="{{ route('admin.pos.index') }}" class="hover:text-white transition">Mode Kasir</a></li>
+                            <li><a href="{{ route('admin.reports.index') }}" class="hover:text-white transition">Laporan Transaksi Pelanggan</a></li>
+                            <li><a href="{{ route('admin.users.index') }}" class="hover:text-white transition">Kelola Pengguna & Role</a></li>
                         @else
                             <li><a href="{{ route('home') }}" class="hover:text-white transition">Beranda</a></li>
                             <li><a href="{{ route('menu.index') }}" class="hover:text-white transition">Daftar Menu</a></li>
@@ -357,7 +405,13 @@
                 <!-- Col 3: Ketentuan Role -->
                 <div>
                     <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">
-                        {{ auth()->check() && auth()->user()->role === 'kasir' ? 'Aturan Kasir' : 'Aturan Pelanggan' }}
+                        @if(auth()->check() && auth()->user()->role === 'kasir')
+                            Aturan Kasir
+                        @elseif(auth()->check() && auth()->user()->role === 'admin')
+                            Aturan Admin
+                        @else
+                            Aturan Pelanggan
+                        @endif
                     </h4>
                     <ul class="space-y-2 text-xs text-slate-400 leading-relaxed">
                         @if(auth()->check() && auth()->user()->role === 'kasir')
@@ -376,6 +430,23 @@
                             <li class="flex items-start gap-2">
                                 <i class="fa-solid fa-lock text-amber-400 mt-0.5"></i>
                                 <span>Tidak dapat mengubah atau menghapus identitas pengguna</span>
+                            </li>
+                        @elseif(auth()->check() && auth()->user()->role === 'admin')
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                <span>Bisa tambah, edit, dan hapus menu</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                <span>Bisa melihat laporan transaksi tiap pelanggan</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                <span>Menjadi kasir & bisa memesan makanan</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                <span>Melihat pengguna login & mengelola role pengguna</span>
                             </li>
                         @else
                             <li class="flex items-start gap-2">
@@ -421,7 +492,12 @@
             <!-- Bottom Copyright -->
             <div class="border-t border-slate-800 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
                 <p>&copy; 2024 RasaKita. Semua Hak Dilindungi.</p>
-                <p class="text-slate-600">Aplikasi Khusus <span class="text-orange-400 font-semibold">Pelanggan RasaKita</span></p>
+                <p class="text-slate-600">
+                    Aplikasi Khusus 
+                    <span class="{{ auth()->check() && auth()->user()->role === 'admin' ? 'text-emerald-400' : 'text-orange-400' }} font-semibold">
+                        {{ auth()->check() && auth()->user()->role === 'admin' ? 'Admin RasaKita' : 'Pelanggan RasaKita' }}
+                    </span>
+                </p>
             </div>
         </div>
     </footer>
@@ -480,7 +556,7 @@
             })
             .catch(err => {
                 console.error(err);
-                window.location.href = "{{ route('menu.index') }}";
+                window.location.href = "{{ auth()->check() && auth()->user()->role === 'admin' ? route('admin.menus.index') : route('menu.index') }}";
             });
         }
     </script>

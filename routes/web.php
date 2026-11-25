@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminMenuController;
+use App\Http\Controllers\Admin\AdminPosController;
+use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
@@ -90,4 +94,26 @@ Route::middleware(['auth', 'role:kasir,admin'])->prefix('kasir')->name('kasir.')
 
     // Aturan Kasir 1: Pembatasan ubah identitas pengguna (403 Forbidden)
     Route::match(['get', 'put', 'patch', 'delete'], '/pengguna/{id?}', [KasirOrderController::class, 'blokirKelolaPengguna'])->name('pengguna.blocked');
+});
+
+/*
+|--------------------------------------------------------------------------
+| RasaKita Routes - Khusus Role Admin
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Kelola Menu (Tambah, Edit, Hapus)
+    Route::resource('menus', AdminMenuController::class)->except(['show']);
+
+    // Mode Kasir Admin
+    Route::get('/kasir', [AdminPosController::class, 'index'])->name('pos.index');
+    Route::post('/kasir/pesan', [AdminPosController::class, 'store'])->name('pos.store');
+
+    // Laporan Transaksi Tiap Pelanggan
+    Route::get('/laporan-transaksi', [AdminReportController::class, 'index'])->name('reports.index');
+
+    // Kelola Pengguna & Role
+    Route::get('/pengguna', [AdminUserController::class, 'index'])->name('users.index');
+    Route::patch('/pengguna/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.role');
+    Route::post('/pengguna', [AdminUserController::class, 'store'])->name('users.store');
 });

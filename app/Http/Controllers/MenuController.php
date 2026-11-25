@@ -8,74 +8,59 @@ use Illuminate\Http\Request;
 
 class MenuController extends Controller
 {
-    /**
-     * Menampilkan katalog menu untuk pelanggan.
-     * Mode Read-Only: Pelanggan hanya melihat dan memesan menu.
-     */
     public function index(Request $request)
     {
+        if (auth()->check() && auth()->user()->role === 'admin') {
+            return redirect()->route('admin.menus.index');
+        }
+
         $categories = Category::withCount('menus')->get();
-        $selectedCategory = $request->query('kategori');
-        $search = $request->query('cari');
-        $sort = $request->query('urutan', 'default');
+        $query = Menu::with('category');
 
-        $query = Menu::with('category')->where('is_available', true);
+        if ($request->filled('cari')) {
+            $query->where('name', 'like', '%' . $request->cari . '%');
+        }
 
-        if ($selectedCategory && $selectedCategory !== 'semua') {
-            $query->whereHas('category', function ($q) use ($selectedCategory) {
-                $q->where('slug', $selectedCategory);
+        if ($request->filled('kategori') && $request->kategori !== 'semua') {
+            $query->whereHas('category', function ($q) use ($request) {
+                $q->where('slug', $request->kategori);
             });
         }
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhereHas('category', function ($catQ) use ($search) {
-                      $catQ->where('name', 'like', "%{$search}%");
-                  });
-            });
-        }
-
-        if ($sort === 'termurah') {
-            $query->orderBy('price', 'asc');
-        } elseif ($sort === 'termahal') {
-            $query->orderBy('price', 'desc');
-        } elseif ($sort === 'rating') {
-            $query->orderBy('rating', 'desc');
-        } else {
-            $query->latest();
+        switch ($request->urutan) {
+            case 'termurah':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'termahal':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'rating':
+                $query->orderBy('rating', 'desc');
+                break;
+            default:
+                $query->latest();
+                break;
         }
 
         $menus = $query->paginate(12)->withQueryString();
 
-        return view('pelanggan.menu', compact('menus', 'categories', 'selectedCategory', 'search', 'sort'));
+        $viewName = view()->exists('pelanggan.menu') ? 'pelanggan.menu' : 'menu';
+
+        return view($viewName, compact('menus', 'categories'));
     }
 
-    /**
-     * ATURAN PELANGGAN 1:
-     * Pelanggan TIDAK BISA tambah menu.
-     */
     public function store(Request $request)
     {
-        abort(403, 'Akses Ditolak: Role Pelanggan tidak memiliki izin untuk menambah menu.');
+        abort(403, 'Akses Ditolak: Pelanggan tidak dapat menambah menu.');
     }
 
-    /**
-     * ATURAN PELANGGAN 1:
-     * Pelanggan TIDAK BISA edit menu.
-     */
     public function update(Request $request, Menu $menu)
     {
-        abort(403, 'Akses Ditolak: Role Pelanggan tidak memiliki izin untuk mengedit menu.');
+        abort(403, 'Akses Ditolak: Pelanggan tidak dapat mengedit menu.');
     }
 
-    /**
-     * ATURAN PELANGGAN 1:
-     * Pelanggan TIDAK BISA hapus menu.
-     */
     public function destroy(Menu $menu)
     {
-        abort(403, 'Akses Ditolak: Role Pelanggan tidak memiliki izin untuk menghapus menu.');
+        abort(403, 'Akses Ditolak: Pelanggan tidak dapat menghapus menu.');
     }
 }
