@@ -95,7 +95,6 @@
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50 antialiased">
 
-    @if(!auth()->check() || auth()->user()->role !== 'kasir')
         <div class="no-print bg-slate-900 text-slate-300 text-xs py-1.5 px-4">
             <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
@@ -107,6 +106,11 @@
                                 ADMIN ({{ auth()->user()->name }})
                             </span>
                             <span class="text-emerald-300 italic hidden sm:inline">• Kelola Menu, Kasir, Laporan Pelanggan & Kelola Role Pengguna</span>
+                        @elseif(auth()->user()->role === 'kasir')
+                            <span class="font-bold text-white px-2 py-0.5 rounded bg-blue-600">
+                                KASIR ({{ auth()->user()->name }})
+                            </span>
+                            <span class="text-blue-300 italic hidden sm:inline">• Konfirmasi Pesanan & Mode Kasir POS</span>
                         @else
                             <span class="font-bold text-white px-2 py-0.5 rounded bg-orange-600">
                                 PELANGGAN ({{ auth()->user()->name }})
@@ -119,16 +123,21 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                     <span class="text-slate-400">Ganti Akun:</span>
+                    <a href="{{ route('quick.login', 'admin') }}" class="px-2.5 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition">
+                        <i class="fa-solid fa-user-shield mr-1"></i> Admin
+                    </a>
+                    <a href="{{ route('quick.login', 'kasir') }}" class="px-2.5 py-0.5 rounded bg-blue-600 hover:bg-blue-500 text-white font-medium transition">
+                        <i class="fa-solid fa-cash-register mr-1"></i> Kasir
+                    </a>
                     <a href="{{ route('quick.login', 'pelanggan') }}" class="px-2.5 py-0.5 rounded bg-orange-600 hover:bg-orange-500 text-white font-medium transition">
-                        <i class="fa-solid fa-user-check mr-1"></i> Pelanggan 1 (Budi)
+                        <i class="fa-solid fa-user-check mr-1"></i> Pelanggan (Budi)
                     </a>
                     <a href="{{ route('quick.login', 'siti') }}" class="px-2.5 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-medium transition">
-                        <i class="fa-solid fa-user mr-1"></i> Pelanggan 2 (Siti)
+                        <i class="fa-solid fa-user mr-1"></i> Pelanggan (Siti)
                     </a>
                 </div>
             </div>
         </div>
-    @endif
 
     <!-- Main Navigation Bar -->
     <header class="no-print sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm transition-all">

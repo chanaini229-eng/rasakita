@@ -17,17 +17,30 @@
         </div>
 
         <!-- Quick 1-Click Login for Easy Testing -->
-        <div class="bg-orange-50/70 border border-orange-200/60 rounded-2xl p-3.5 space-y-2">
+        <div class="bg-orange-50/70 border border-orange-200/60 rounded-2xl p-3.5 space-y-2.5">
             <p class="text-[11px] font-bold text-[#e8503a] uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-bolt"></i> 1-Klik Masuk (Untuk Pengujian Aturan):
+                <i class="fa-solid fa-bolt"></i> 1-Klik Masuk Semua Role (Untuk Pengujian):
             </p>
             <div class="grid grid-cols-2 gap-2 text-xs">
-                <a href="{{ route('quick.login', 'pelanggan') }}" class="px-2.5 py-1.5 rounded-xl bg-white border border-orange-200 text-slate-700 hover:bg-[#e8503a] hover:text-white font-bold transition text-center shadow-xs">
-                    Pelanggan 1 (Budi)
+                <a href="{{ route('quick.login', 'admin') }}" class="px-2.5 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-700 hover:bg-emerald-600 hover:text-white font-bold transition text-center shadow-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-user-shield text-[11px]"></i> Admin
                 </a>
-                <a href="{{ route('quick.login', 'siti') }}" class="px-2.5 py-1.5 rounded-xl bg-white border border-orange-200 text-slate-700 hover:bg-[#e8503a] hover:text-white font-bold transition text-center shadow-xs">
-                    Pelanggan 2 (Siti)
+                <a href="{{ route('quick.login', 'kasir') }}" class="px-2.5 py-1.5 rounded-xl bg-white border border-blue-300 text-blue-700 hover:bg-blue-600 hover:text-white font-bold transition text-center shadow-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-cash-register text-[11px]"></i> Kasir (Sinta)
                 </a>
+                <a href="{{ route('quick.login', 'pelanggan') }}" class="px-2.5 py-1.5 rounded-xl bg-white border border-orange-200 text-slate-700 hover:bg-[#e8503a] hover:text-white font-bold transition text-center shadow-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-user text-[11px]"></i> Pelanggan (Budi)
+                </a>
+                <a href="{{ route('quick.login', 'siti') }}" class="px-2.5 py-1.5 rounded-xl bg-white border border-orange-200 text-slate-700 hover:bg-[#e8503a] hover:text-white font-bold transition text-center shadow-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-user text-[11px]"></i> Pelanggan (Siti)
+                </a>
+            </div>
+            <div class="bg-white/80 rounded-xl p-2.5 border border-orange-100 text-[11px] text-slate-600 space-y-1">
+                <div class="font-semibold text-slate-700 mb-0.5">Kredensial Akun Default (Password: <code class="text-[#e8503a]">password</code>):</div>
+                <div class="flex justify-between items-center"><span class="text-emerald-700 font-medium">• Admin:</span> <code class="text-slate-800">admin@rasakita.com</code></div>
+                <div class="flex justify-between items-center"><span class="text-blue-700 font-medium">• Kasir:</span> <code class="text-slate-800">kasir@rasakita.com</code></div>
+                <div class="flex justify-between items-center"><span class="text-orange-700 font-medium">• Pelanggan 1:</span> <code class="text-slate-800">pelanggan@rasakita.com</code></div>
+                <div class="flex justify-between items-center"><span class="text-orange-700 font-medium">• Pelanggan 2:</span> <code class="text-slate-800">siti@rasakita.com</code></div>
             </div>
         </div>
 

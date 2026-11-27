@@ -17,7 +17,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // 0. Akun Admin
+        User::updateOrCreate(
+            ['email' => 'admin@rasakita.com'],
+            [
+                'name' => 'Administrator',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'phone' => '081122334455',
+                'address' => 'Kantor Pusat Restoran RasaKita',
+            ]
+        );
 
+        // 1. Akun Kasir
         User::updateOrCreate(
             ['email' => 'kasir@rasakita.com'],
             [
@@ -27,7 +39,7 @@ class DatabaseSeeder extends Seeder
                 'phone' => '081355667788',
                 'address' => 'Kasir Utama Restoran RasaKita',
             ]
-);
+        );
         // 1. Akun Pelanggan 1 (Budi)
         $budi = User::updateOrCreate(
             ['email' => 'pelanggan@rasakita.com'],

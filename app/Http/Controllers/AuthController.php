@@ -26,7 +26,15 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended(route('home'))->with('success', 'Selamat datang kembali, ' . Auth::user()->name . '!');
+            $user = Auth::user();
+
+            if ($user->role === 'admin') {
+                return redirect()->intended(route('admin.menus.index'))->with('success', 'Selamat datang kembali, ' . $user->name . ' (Admin)!');
+            } elseif ($user->role === 'kasir') {
+                return redirect()->intended(route('kasir.dashboard'))->with('success', 'Selamat datang kembali, ' . $user->name . ' (Kasir)!');
+            }
+
+            return redirect()->intended(route('home'))->with('success', 'Selamat datang kembali, ' . $user->name . '!');
         }
 
         return back()->withErrors([
@@ -76,11 +84,15 @@ class AuthController extends Controller
     }
 
     /**
-     * Switcher akun untuk memverifikasi isolasi transaksi antar sesama pelanggan
+     * Switcher akun untuk memverifikasi isolasi transaksi dan peran antar role
      */
     public function quickLogin($role)
     {
-        if ($role === 'pelanggan') {
+        if ($role === 'admin') {
+            $user = User::where('role', 'admin')->first();
+        } elseif ($role === 'kasir') {
+            $user = User::where('role', 'kasir')->first();
+        } elseif ($role === 'pelanggan') {
             $user = User::where('email', 'pelanggan@rasakita.com')->first();
         } elseif ($role === 'siti') {
             $user = User::where('email', 'siti@rasakita.com')->first();
@@ -88,7 +100,12 @@ class AuthController extends Controller
 
         if (isset($user) && $user) {
             Auth::login($user);
-            return back()->with('success', 'Berhasil beralih akun: ' . $user->name . ' (Pelanggan)');
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.menus.index')->with('success', 'Berhasil beralih akun: ' . $user->name . ' (Admin)');
+            } elseif ($user->role === 'kasir') {
+                return redirect()->route('kasir.dashboard')->with('success', 'Berhasil beralih akun: ' . $user->name . ' (Kasir)');
+            }
+            return redirect()->route('home')->with('success', 'Berhasil beralih akun: ' . $user->name . ' (Pelanggan)');
         }
 
         return back()->with('error', 'Pengguna tidak ditemukan.');
