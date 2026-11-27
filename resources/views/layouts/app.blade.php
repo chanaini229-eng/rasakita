@@ -148,25 +148,25 @@
                 </a>
 
                 <!-- Desktop Nav Links (Dinamis sesuai Role) -->
-                <nav class="hidden md:flex items-center space-x-7">
+                <nav class="hidden md:flex items-center space-x-4 lg:space-x-5 whitespace-nowrap">
                     @if(auth()->check() && auth()->user()->role === 'kasir')
+                        <a href="{{ route('home') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('home') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Beranda
+                        </a>
                         <a href="{{ route('kasir.dashboard') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('kasir.dashboard') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
-                            Dashboard Kasir
+                            Dashboard
                         </a>
                         <a href="{{ route('kasir.menu.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('kasir.menu.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
-                            Daftar Menu
+                            Kelola Menu
                         </a>
                         <a href="{{ route('kasir.pesanan.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('kasir.pesanan.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
                             Konfirmasi Pesanan
                         </a>
                         <a href="{{ route('kasir.laporan.index') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('kasir.laporan.*') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
-                            Laporan & Struk
+                            Laporan
                         </a>
-                        <a href="{{ route('about') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('about') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
-                            Tentang Kami
-                        </a>
-                        <a href="{{ route('contact') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('contact') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
-                            Kontak
+                        <a href="{{ route('order.history') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('order.history') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
+                            Riwayat Transaksi
                         </a>
                     @elseif(auth()->check() && auth()->user()->role === 'admin')
                         <a href="{{ route('home') }}" class="text-sm font-semibold transition-colors {{ request()->routeIs('home') ? 'text-[#e8503a] border-b-2 border-[#e8503a] pb-1' : 'text-slate-600 hover:text-[#e8503a]' }}">
@@ -210,24 +210,22 @@
 
                 <!-- Right Side Actions: Search, Cart, User -->
                 <div class="flex items-center gap-4">
-                    @if(!auth()->check() || auth()->user()->role !== 'kasir')
-                        <!-- Search Icon Trigger -->
-                        <a href="{{ auth()->check() && auth()->user()->role === 'admin' ? route('admin.menus.index') : route('menu.index') }}" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-[#e8503a] hover:bg-orange-50 transition" title="Cari Menu">
-                            <i class="fa-solid fa-magnifying-glass text-lg"></i>
-                        </a>
+                    <!-- Search Icon Trigger -->
+                    <a href="{{ auth()->check() && auth()->user()->role === 'admin' ? route('admin.menus.index') : route('menu.index') }}" class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-[#e8503a] hover:bg-orange-50 transition" title="Cari Menu">
+                        <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                    </a>
 
-                        <!-- Cart Icon with Live Badge -->
-                        @php
-                            $cart = session()->get('cart', []);
-                            $cartCount = array_sum(array_column($cart, 'quantity'));
-                        @endphp
-                        <a href="{{ route('cart.index') }}" class="relative w-10 h-10 rounded-full flex items-center justify-center text-slate-700 hover:text-[#e8503a] hover:bg-orange-50 transition" title="Keranjang Pesanan">
-                            <i class="fa-solid fa-cart-shopping text-lg"></i>
-                            <span id="cart-badge" class="absolute -top-1 -right-1 bg-[#e8503a] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm {{ $cartCount > 0 ? '' : 'hidden' }}">
-                                {{ $cartCount }}
-                            </span>
-                        </a>
-                    @endif
+                    <!-- Cart Icon with Live Badge -->
+                    @php
+                        $cart = session()->get('cart', []);
+                        $cartCount = array_sum(array_column($cart, 'quantity'));
+                    @endphp
+                    <a href="{{ route('cart.index') }}" class="relative w-10 h-10 rounded-full flex items-center justify-center text-slate-700 hover:text-[#e8503a] hover:bg-orange-50 transition" title="Keranjang Pesanan">
+                        <i class="fa-solid fa-cart-shopping text-lg"></i>
+                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-[#e8503a] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm {{ $cartCount > 0 ? '' : 'hidden' }}">
+                            {{ $cartCount }}
+                        </span>
+                    </a>
 
                     <!-- User Profile / Auth Button -->
                     @auth
@@ -261,7 +259,14 @@
                                         <i class="fa-solid fa-clipboard-check text-slate-400"></i> Konfirmasi Pesanan
                                     </a>
                                     <a href="{{ route('kasir.laporan.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
-                                        <i class="fa-solid fa-receipt text-slate-400"></i> Laporan & Struk
+                                        <i class="fa-solid fa-file-invoice-dollar text-slate-400"></i> Laporan 
+                                    </a>
+                                    <div class="border-t border-slate-100 my-1"></div>
+                                    <a href="{{ route('order.history') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-receipt text-slate-400"></i> Riwayat Transaksi Saya
+                                    </a>
+                                    <a href="{{ route('cart.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
+                                        <i class="fa-solid fa-cart-shopping text-slate-400"></i> Keranjang Pesanan
                                     </a>
                                 @elseif(auth()->user()->role === 'admin')
                                     <a href="{{ route('admin.menus.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-orange-50 hover:text-[#e8503a] transition">
@@ -384,6 +389,7 @@
                             <li><a href="{{ route('kasir.menu.index') }}" class="hover:text-white transition">Kelola Daftar Menu</a></li>
                             <li><a href="{{ route('kasir.pesanan.index') }}" class="hover:text-white transition">Konfirmasi Pesanan</a></li>
                             <li><a href="{{ route('kasir.laporan.index') }}" class="hover:text-white transition">Laporan & Struk</a></li>
+                            <li><a href="{{ route('order.history') }}" class="hover:text-white transition">Riwayat Transaksi Saya</a></li>
                         @elseif(auth()->check() && auth()->user()->role === 'admin')
                             <li><a href="{{ route('home') }}" class="hover:text-white transition">Beranda</a></li>
                             <li><a href="{{ route('admin.menus.index') }}" class="hover:text-white transition">Kelola Daftar Menu</a></li>

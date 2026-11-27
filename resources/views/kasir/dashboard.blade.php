@@ -13,7 +13,10 @@
             <p class="text-xs sm:text-sm text-slate-500 mt-1">Konfirmasi pesanan pelanggan, kelola daftar menu, dan cetak struk pembayaran.</p>
         </div>
         <div class="flex flex-wrap gap-2.5">
-            <a href="{{ route('kasir.pesanan.index') }}" class="btn-brand px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
+            <a href="{{ route('kasir.pos.index') }}" class="btn-brand px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
+                <i class="fa-solid fa-cash-register"></i> Mode Kasir
+            </a>
+            <a href="{{ route('kasir.pesanan.index') }}" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold flex items-center gap-2">
                 <i class="fa-solid fa-clipboard-check"></i> Konfirmasi Pesanan ({{ $pesananPerluKonfirmasi }})
             </a>
             <a href="{{ route('kasir.menu.create') }}" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-2">

@@ -1,10 +1,12 @@
 @extends('layouts.app')
-@section('title', 'Mode Kasir Admin - RasaKita')
+@section('title', (auth()->user()->role === 'kasir' ? 'Mode Kasir' : 'Mode Kasir Admin') . ' - RasaKita')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-6">
-        <h1 class="text-2xl font-extrabold text-slate-900">Kasir & Pemesanan Langsung (Admin)</h1>
+        <h1 class="text-2xl font-extrabold text-slate-900">
+            Kasir & Pemesanan Langsung ({{ auth()->user()->role === 'kasir' ? 'Kasir' : 'Admin' }})
+        </h1>
         <p class="text-xs text-slate-500 mt-1">Pilih menu untuk pelanggan, hitung kembalian tunai, dan cetak struk pembayaran.</p>
     </div>
 
@@ -51,7 +53,7 @@
                     <p class="text-xs text-slate-400 py-4 text-center">Belum ada item dipilih.</p>
                 @endforelse
 
-                <form action="{{ route('admin.pos.store') }}" method="POST" class="space-y-3 pt-2">
+                <form action="{{ auth()->user()->role === 'kasir' ? route('kasir.pos.store') : route('admin.pos.store') }}" method="POST" class="space-y-3 pt-2">
                     @csrf
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Akun Pelanggan (Opsional)</label>

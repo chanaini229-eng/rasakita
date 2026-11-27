@@ -84,6 +84,10 @@ Route::middleware(['auth', 'role:kasir,admin'])->prefix('kasir')->name('kasir.')
     // Daftar Menu (Kelola Menu: Tambah, Edit, Hapus)
     Route::resource('menu', KasirMenuController::class)->except(['show']);
 
+    // Mode Kasir / Pemesanan Langsung (POS)
+    Route::get('/pos', [AdminPosController::class, 'index'])->name('pos.index');
+    Route::post('/pos/pesan', [AdminPosController::class, 'store'])->name('pos.store');
+
     // Konfirmasi Pesanan Mandiri dari Pelanggan
     Route::get('/pesanan', [KasirOrderController::class, 'konfirmasiIndex'])->name('pesanan.index');
     Route::patch('/pesanan/{order}/status', [KasirOrderController::class, 'updateStatus'])->name('pesanan.status');
